@@ -74,6 +74,64 @@ OPENCLAW_STATE_DIR=~/.openclaw3 bash scripts/test-env-load.sh
 
 ---
 
+### 3. 宿主机管理脚本
+
+#### openclaw-host.sh
+
+**用途**: 管理宿主机 OpenClaw 实例的启动、停止和配置
+
+**功能**:
+- 🚀 管理 Gateway 生命周期（start/stop/restart）
+- 🔧 自动加载 `.env` 环境变量
+- 📊 查看实例状态和端口使用情况
+- 🔗 设备配对管理
+- ✏️ 便捷的环境变量编辑
+
+**安装**:
+```bash
+# 复制到服务器
+scp scripts/openclaw-host.sh user@server:~/openclaw-host.sh
+
+# 设置执行权限
+ssh user@server "chmod +x ~/openclaw-host.sh"
+```
+
+**使用**:
+```bash
+# 启动 Gateway
+~/openclaw-host.sh start
+
+# 查看状态
+~/openclaw-host.sh status
+
+# 重启服务
+~/openclaw-host.sh restart
+
+# 配对设备
+~/openclaw-host.sh pair
+
+# 编辑环境变量
+~/openclaw-host.sh env
+
+# 执行 openclaw 命令
+~/openclaw-host.sh cli device list
+~/openclaw-host.sh cli gateway status
+```
+
+**环境变量**:
+- `OPENCLAW_STATE_DIR`: 默认 `~/.openclaw3`
+- 自动加载 `$OPENCLAW_STATE_DIR/.env` 中的所有变量
+
+**特性**:
+- ✅ 启动前自动加载环境变量
+- ✅ 统一的实例管理接口
+- ✅ 端口冲突检测（18789/28789/38789）
+- ✅ 支持多实例部署（通过修改 `OPENCLAW_STATE_DIR`）
+
+**文档**: [README-openclaw-host.md](./README-openclaw-host.md) | [宿主机部署指南](../docs/Host-Instance-Deployment-Guide-zh.md)
+
+---
+
 ## 🚀 快速开始
 
 ### 部署安全审计
@@ -108,15 +166,39 @@ ssh user@server "bash ~/.openclaw3/test-env-load.sh"
 # 如果报错，按提示修改 .env 文件
 ```
 
+### 部署宿主机管理脚本
+
+```bash
+# 1. 复制管理脚本到服务器
+scp scripts/openclaw-host.sh user@server:~/openclaw-host.sh
+
+# 2. 设置执行权限
+ssh user@server "chmod +x ~/openclaw-host.sh"
+
+# 3. 验证环境变量
+ssh user@server "bash ~/.openclaw3/test-env-load.sh"
+
+# 4. 启动实例
+ssh user@server "~/openclaw-host.sh start"
+
+# 5. 检查状态
+ssh user@server "~/openclaw-host.sh status"
+
+# 6. 配对设备
+ssh user@server "~/openclaw-host.sh pair"
+```
+
 ## 📂 目录结构
 
 ```
 scripts/
 ├── README.md                          # 本文件
 ├── README-test-env-load.md            # 环境变量测试脚本文档
+├── README-openclaw-host.md            # 宿主机管理脚本文档
 ├── nightly-security-audit-v2.8.sh     # 安全审计脚本 v2.8
 ├── nightly-security-audit.sh          # 安全审计脚本（早期版本）
-└── test-env-load.sh                   # 环境变量加载测试脚本
+├── test-env-load.sh                   # 环境变量加载测试脚本
+└── openclaw-host.sh                   # 宿主机实例管理脚本
 ```
 
 ## 🔐 安全注意事项
