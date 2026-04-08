@@ -3,7 +3,9 @@
 > **适用场景**: 在已有 Docker 容器运行的服务器上，部署独立的宿主机 OpenClaw 实例  
 > **前置条件**: 服务器已通过 Docker Compose 运行 OpenClaw 容器  
 > **配置时长**: 约 30-40 分钟  
-> **基于版本**: OpenClaw 2026.4.5 | Security Guide v2.8
+> **基于版本**: OpenClaw 2026.3.2 | Security Guide v2.8
+
+⚠️ **版本说明**: 使用 2026.3.2 而非最新版本（2026.4.5），因为最新版本存在 CLI pairing bug ([#61762](https://github.com/openclaw/openclaw/issues/61762))，会导致 `cron add` 等写操作失败。
 
 ---
 
@@ -51,24 +53,27 @@ sudo ss -tlnp | grep -E '(18789|28789|38789)'
 ### 步骤 2: 安装 OpenClaw CLI
 
 ```bash
-# 全局安装（系统级 Node.js）
-sudo npm install -g openclaw@latest
+# 安装 2026.3.2 版本（避免 CLI pairing bug）
+sudo npm install -g openclaw@2026.3.2
 
 # 如果使用 nvm 管理 Node.js，不要用 sudo
-# npm install -g openclaw@latest
+# npm install -g openclaw@2026.3.2
 
 # 验证安装
 openclaw --version
+# 应输出: 2026.3.2
 ```
+
+> **⚠️ 重要**: 不要使用 `openclaw@latest`，因为 2026.4.x 版本存在 CLI pairing bug，会导致所有写操作失败。
 
 ### 步骤 3: 配置独立状态目录
 
 ```bash
-# 添加环境变量到 .bashrc
-echo 'export OPENCLAW_STATE_DIR="$HOME/.openclaw3"' >> ~/.bashrc
+# 添加环境变量到 .zshrc
+echo 'export OPENCLAW_STATE_DIR="$HOME/.openclaw3"' >> ~/.zshrc
 
 # 立即生效
-source ~/.bashrc
+source ~/.zshrc
 
 # 验证环境变量
 echo $OPENCLAW_STATE_DIR
@@ -85,7 +90,7 @@ mkdir -p ~/.openclaw3/{devices,workspace,logs,security-reports}
 cat > ~/.openclaw3/openclaw.json << 'EOF'
 {
   "meta": {
-    "lastTouchedVersion": "2026.4.5",
+    "lastTouchedVersion": "2026.3.2",
     "lastTouchedAt": "2026-04-08T00:00:00.000Z"
   },
   "gateway": {
@@ -135,7 +140,7 @@ chmod 600 ~/.openclaw3/.env
 cat > ~/.openclaw3/openclaw.json << 'EOF'
 {
   "meta": {
-    "lastTouchedVersion": "2026.4.5",
+    "lastTouchedVersion": "2026.3.2",
     "lastTouchedAt": "2026-04-08T00:00:00.000Z"
   },
   "browser": {
@@ -276,18 +281,7 @@ cat > ~/.openclaw3/openclaw.json << 'EOF'
     }
   },
   "plugins": {
-    "allow": [
-      "feishu",
-      "feishu-messaging"
-    ],
-    "entries": {
-      "feishu": {
-        "enabled": true
-      },
-      "feishu-messaging": {
-        "enabled": true
-      }
-    }
+    "allow": []
   },
   "gateway": {
     "port": 38789,
@@ -417,7 +411,7 @@ test -d ~/.openclaw3/extensions/feishu-messaging/node_modules && echo "插件依
 curl -o ~/.openclaw3/test-env-load.sh https://raw.githubusercontent.com/holynull/openclaw-security-practice-guide/main/scripts/test-env-load.sh
 
 # 运行验证
-bash ~/.openclaw3/test-env-load.sh
+zsh ~/.openclaw3/test-env-load.sh
 ```
 
 **环境变量验证输出说明**:
@@ -429,7 +423,7 @@ bash ~/.openclaw3/test-env-load.sh
 > ```bash
 > ~/openclaw-host.sh env
 > # 编辑后重新验证
-> bash ~/.openclaw3/test-env-load.sh
+> zsh ~/.openclaw3/test-env-load.sh
 > ```
 >
 > 📖 **验证脚本文档**: [scripts/README-test-env-load.md](../scripts/README-test-env-load.md)
@@ -505,7 +499,7 @@ vim $OC/workspace/scripts/nightly-security-audit.sh
 
 ```bash
 # 执行一次，确认无错误
-bash $OC/workspace/scripts/nightly-security-audit.sh
+zsh $OC/workspace/scripts/nightly-security-audit.sh
 
 # 查看生成的报告
 ls -lh $OC/security-reports/
@@ -765,7 +759,7 @@ git push -u origin main
 ```bash
 # 创建独立的备份脚本
 cat > ~/openclaw-host-backup.sh << 'EOF'
-#!/bin/bash
+#!/bin/zsh
 cd "$HOME/.openclaw3"
 git add .
 git commit -m "Auto backup $(date +%Y-%m-%d_%H:%M:%S)" || true
@@ -909,7 +903,7 @@ sudo chattr -i ~/.openclaw3/workspace/scripts/nightly-security-audit.sh
 vim ~/.openclaw3/workspace/scripts/nightly-security-audit.sh
 
 # 3. 测试修改
-bash ~/.openclaw3/workspace/scripts/nightly-security-audit.sh
+zsh ~/.openclaw3/workspace/scripts/nightly-security-audit.sh
 
 # 4. 重新锁定
 sudo chattr +i ~/.openclaw3/workspace/scripts/nightly-security-audit.sh
@@ -1155,8 +1149,8 @@ sudo grep -E 'openclaw|~/.openclaw3' /var/log/auth.log | tail -50
 **解决方案**:
 
 ```bash
-# 1. 重新加载 bashrc
-source ~/.bashrc
+# 1. 重新加载 zshrc
+source ~/.zshrc
 
 # 2. 验证环境变量
 echo $OPENCLAW_STATE_DIR

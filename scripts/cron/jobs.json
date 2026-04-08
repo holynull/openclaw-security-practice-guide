@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "aa020381-04c8-4369-b091-460f193ac3fd",
+      "name": "nightly-security-audit",
+      "description": "Nightly Security Audit - Host Instance (.openclaw3)",
+      "enabled": true,
+      "createdAtMs": 1775628715059,
+      "updatedAtMs": 1775628944395,
+      "schedule": {
+        "kind": "cron",
+        "expr": "0 2 * * *",
+        "tz": "Asia/Singapore"
+      },
+      "sessionTarget": "isolated",
+      "wakeMode": "now",
+      "payload": {
+        "kind": "agentTurn",
+        "message": "Execute the security audit script, then summarize the output into a concise security report. List all 13 items with emoji status indicators (🚨/⚠️/✅). Start with a one-line summary header showing critical/warn/ok counts. Command: bash scripts/nightly-security-audit.sh",
+        "model": "gptsapi/gpt-4o",
+        "thinking": "off",
+        "timeoutSeconds": 300,
+        "lightContext": true
+      },
+      "delivery": {
+        "mode": "announce",
+        "channel": "feishu",
+        "to": "oc_53d1a541f08d2d9f2e8c3c79a1f12fc3"
+      },
+      "state": {
+        "nextRunAtMs": 1775671200000,
+        "lastRunAtMs": 1775628923861,
+        "lastRunStatus": "ok",
+        "lastStatus": "ok",
+        "lastDurationMs": 20534,
+        "lastDelivered": true,
+        "lastDeliveryStatus": "delivered",
+        "consecutiveErrors": 0
+      }
+    }
+  ]
+}

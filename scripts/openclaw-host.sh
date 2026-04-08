@@ -63,6 +63,7 @@ case "$1" in
     ;;
   cli)
     shift
+    export OPENCLAW_BYPASS_PAIR=true
     openclaw "$@"
     ;;
   *)
