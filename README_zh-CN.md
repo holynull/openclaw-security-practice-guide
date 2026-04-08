@@ -99,6 +99,14 @@
 ### 工具与脚本
 * [`scripts/nightly-security-audit.sh`](scripts/nightly-security-audit.sh) - v2.7 参考巡检脚本（仅供查阅，无需手动安装）
 * [`scripts/nightly-security-audit-v2.8.sh`](scripts/nightly-security-audit-v2.8.sh) - **v2.8 Beta** 参考脚本，含已知问题排除、报告持久化、30 天轮转、Token 优化输出
+* [`scripts/openclaw-host.sh`](scripts/openclaw-host.sh) - 宿主机实例管理脚本，自动加载环境变量
+* [`scripts/test-env-load.sh`](scripts/test-env-load.sh) - 环境变量配置验证脚本
+* [`scripts/cron-messages/`](scripts/cron-messages/) - Cron 任务消息模板目录
+
+### 扩展与插件
+* [`extensions/feishu-messaging/`](extensions/feishu-messaging/) - 飞书消息插件，用于安全审计报告推送
+  - `send_feishu_reminder` - 发送提醒消息（支持 @提醒和富文本）
+  - `send_feishu_report` - 发送格式化报告（支持 lark_md 渲染）
 
 ## 🤝 贡献
 欢迎提交 Contributions, Issues 和 Feature Requests！

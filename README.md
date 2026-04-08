@@ -99,6 +99,13 @@ To ensure your AI assistant doesn't bypass its own defenses out of "obedience", 
 ### Tools & Scripts
 * [`scripts/nightly-security-audit.sh`](scripts/nightly-security-audit.sh) - Reference shell script (v2.7) for nightly auditing and Git backups
 * [`scripts/nightly-security-audit-v2.8.sh`](scripts/nightly-security-audit-v2.8.sh) - **v2.8 Beta** reference script with known-issues exclusion, persistent reports, 30-day rotation, and token-optimized output
+* [`scripts/openclaw-host.sh`](scripts/openclaw-host.sh) - Host instance management script with automatic environment variable loading
+* [`scripts/test-env-load.sh`](scripts/test-env-load.sh) - Environment variable validation script
+
+### Extensions & Plugins
+* [`extensions/feishu-messaging/`](extensions/feishu-messaging/) - Feishu (Lark) messaging plugin for security audit reports
+  - `send_feishu_reminder` - Send reminder messages with @mentions and rich text
+  - `send_feishu_report` - Send formatted reports with lark_md rendering
 
 ## 🤝 Contributing
 Contributions, issues, and feature requests are welcome!
