@@ -600,144 +600,32 @@ cat ~/.openclaw3/devices/paired.json
 
 ## 第四阶段：配置定时审计任务
 
-### 步骤 1: 获取飞书群组 Chat ID
-
-```bash
-# 查看已配对的设备信息
-~/openclaw-host.sh cli device list
-
-# 从飞书群组信息中记录 chatId
-# 例如: oc_53d1a541f08d2d9f2e8c3c79a1f12fc3
-```
-
-> **注意**: 
-> - 飞书群组 ID 格式: `oc_xxxxxxxxxx`
-> - Telegram 群组 ID 格式: `-1002345678901`
-
-### 步骤 2: 创建审计任务消息模板
+### 步骤 1: 部署审计任务模板
 
 ```bash
 export OC="$HOME/.openclaw3"
 
-# 创建 cron_messages 目录
+# 1. 创建 cron_messages 目录
 mkdir -p $OC/workspace/team/cron_messages
 
-# 创建安全审计任务消息文件
-# 替换 <your-feishu-chat-id> 为你的飞书群组 ID
-cat > $OC/workspace/team/cron_messages/nightly-security-audit.md << 'EOF'
-# 宿主机每日安全审计任务
+# 2. 从 GitHub 下载模板（推荐）
+curl -o $OC/workspace/team/cron_messages/nightly-security-audit.md \
+  https://raw.githubusercontent.com/holynull/openclaw-security-practice-guide/main/scripts/cron-messages/nightly-security-audit.md
 
-## 执行步骤
+# 方法 2: 如果已克隆项目仓库
+# cp openclaw-security-practice-guide/scripts/cron-messages/nightly-security-audit.md \
+#    $OC/workspace/team/cron_messages/
 
-### 1. 执行安全审计脚本
-
-运行以下命令生成审计报告：
-
-```bash
-bash $HOME/.openclaw3/workspace/scripts/nightly-security-audit.sh
+# 3. 验证文件
+cat $OC/workspace/team/cron_messages/nightly-security-audit.md | head -10
 ```
 
-### 2. 读取审计报告
+> **📝 注意**: 
+> - 模板已预配置为发送给特定用户 (`ou_0fa58dc0ea9bebec570346e829677da7`)
+> - 如需更改接收者，编辑模板文件中的 `chatId` 参数
+> - 模板内容参考：[scripts/cron-messages/nightly-security-audit.md](../scripts/cron-messages/nightly-security-audit.md)
 
-使用 read 工具读取今日报告：
-
-```
-read({
-  path: "$HOME/.openclaw3/security-reports/report-YYYY-MM-DD.txt"
-})
-```
-
-将 YYYY-MM-DD 替换为当前日期（如 2026-04-08）。
-
-### 3. 生成飞书格式报告
-
-根据审计报告内容，生成飞书 Markdown 格式的报告：
-
-**报告格式要求**：
-- ✅ 使用 **粗体** 和 [链接](url)
-- ✅ 使用 emoji 状态指示器（🚨/⚠️/✅）
-- ❌ 不使用 ## 标题（lark_md 不支持）
-- ❌ 不使用列表语法（用粗体+换行代替）
-
-**报告结构**：
-
-```markdown
-🔒 **OpenClaw 宿主机安全审计报告**
-
-日期：{当前日期}
-实例：~/.openclaw3
-
-━━━━━━━━━━━━━━━━━━━━
-
-📊 **安全状态总览**
-
-🚨 严重问题：{count}
-⚠️ 警告：{count}
-✅ 正常：{count}
-
-━━━━━━━━━━━━━━━━━━━━
-
-📋 **详细检查结果**
-
-**{status} 检查项 1：{名称}**
-状态：{描述}
-{如有问题，说明详情}
-
-**{status} 检查项 2：{名称}**
-状态：{描述}
-
-（继续列出所有 13 项检查）
-
-━━━━━━━━━━━━━━━━━━━━
-
-💡 **建议措施**
-
-{根据发现的问题，给出具体的修复建议}
-
-━━━━━━━━━━━━━━━━━━━━
-
-⏰ 生成时间：{时间戳}
-```
-
-### 4. 发送报告到飞书
-
-调用 send_feishu_file_content 工具发送报告：
-
-```
-send_feishu_file_content({
-  filePath: "{步骤3生成的完整 Markdown 报告文本}",
-  chatId: "<your-feishu-chat-id>",
-  title: "🔒 OpenClaw 宿主机安全审计报告",
-  useMarkdown: true
-})
-```
-
-**参数说明**：
-- `filePath`: 完整的 Markdown 报告内容（字符串）
-- `chatId`: 飞书群组 ID（如 `oc_53d1a541f08d2d9f2e8c3c79a1f12fc3`）
-- `title`: 消息卡片标题
-- `useMarkdown: true`: 启用 lark_md 渲染
-
-## ⚠️ 重要提示
-
-- **必须完整执行所有 4 个步骤**
-- **步骤 3 生成的报告必须包含所有 13 项检查结果**
-- **不要省略任何检查项，不要使用 "..." 表示省略**
-- **必须设置 `useMarkdown: true` 以正确渲染格式**
-- **在发送之前不要输出报告内容（避免重复）**
-EOF
-
-# 编辑文件，替换 <your-feishu-chat-id>
-vim $OC/workspace/team/cron_messages/nightly-security-audit.md
-# 将所有 <your-feishu-chat-id> 替换为你的实际飞书群组 ID
-```
-
-> **💡 提示**: 使用 vim 的替换命令：
-> ```vim
-> :%s/<your-feishu-chat-id>/oc_53d1a541f08d2d9f2e8c3c79a1f12fc3/g
-> ```
-
-### 步骤 3: 注册 Cron 任务
+### 步骤 2: 注册 Cron 任务
 
 ```bash
 export OC="$HOME/.openclaw3"
@@ -767,7 +655,7 @@ export OC="$HOME/.openclaw3"
 > - 新加坡: `Asia/Singapore` (UTC+8)
 > - 美国东部: `America/New_York`
 
-### 步骤 4: 验证 Cron 任务
+### 步骤 3: 验证 Cron 任务
 
 ```bash
 # 列出所有定时任务
@@ -777,7 +665,7 @@ export OC="$HOME/.openclaw3"
 # 应看到: nightly-security-audit-host
 ```
 
-### 步骤 5: 测试执行
+### 步骤 4: 测试执行
 
 ```bash
 # 手动触发一次（替换 <job-id> 为实际的任务 ID）
@@ -793,7 +681,7 @@ export OC="$HOME/.openclaw3"
 **验证结果**：
 1. ✅ 检查命令行输出，确认任务已提交
 2. ✅ 等待 3-5 分钟（LLM 生成报告需要时间）
-3. ✅ 检查飞书群组，应收到安全审计报告卡片
+3. ✅ 检查飞书，应收到安全审计报告卡片（发送给 ou_0fa58dc0ea9bebec570346e829677da7）
 4. ✅ 验证报告格式正确，包含所有 13 项检查
 
 **故障排查**：

@@ -1,7 +1,7 @@
 # 宿主机每日安全审计任务
 
 > **部署位置**: `~/.openclaw3/workspace/team/cron_messages/nightly-security-audit.md`  
-> **配置说明**: 部署前请将 `<your-feishu-chat-id>` 替换为你的实际飞书群组 ID
+> **接收者**: 报告将发送到飞书用户 `ou_0fa58dc0ea9bebec570346e829677da7`
 
 ## 执行步骤
 
@@ -121,7 +121,7 @@ read({
 ```
 send_feishu_file_content({
   filePath: "{步骤3生成的完整 Markdown 报告文本}",
-  chatId: "<your-feishu-chat-id>",
+  chatId: "ou_0fa58dc0ea9bebec570346e829677da7",
   title: "🔒 OpenClaw 宿主机安全审计报告",
   useMarkdown: true
 })
@@ -129,7 +129,7 @@ send_feishu_file_content({
 
 **参数说明**：
 - `filePath`: 完整的 Markdown 报告内容（字符串）
-- `chatId`: 飞书群组 ID（如 `oc_53d1a541f08d2d9f2e8c3c79a1f12fc3`）
+- `chatId`: 飞书用户 ID `ou_0fa58dc0ea9bebec570346e829677da7`（固定接收者）
 - `title`: 消息卡片标题
 - `useMarkdown: true`: 启用 lark_md 渲染
 
@@ -143,27 +143,35 @@ send_feishu_file_content({
 
 ## 📝 配置说明
 
-### 替换占位符
+### 接收者设置
 
-部署此文件时，请将所有 `<your-feishu-chat-id>` 替换为你的实际飞书群组 ID：
+报告已配置为固定发送给飞书用户：
+- **User ID**: `ou_0fa58dc0ea9bebec570346e829677da7`
+- **发送方式**: 使用 `send_feishu_file_content` 工具
+- **消息格式**: 飞书 lark_md 渲染的 Markdown 卡片
+
+### 修改接收者
+
+如需更改接收者，修改步骤 4 中的 `chatId` 参数：
 
 ```bash
-# 使用 vim 替换
+# 编辑任务模板
 vim ~/.openclaw3/workspace/team/cron_messages/nightly-security-audit.md
 
-# 在 vim 中执行
-:%s/<your-feishu-chat-id>/oc_53d1a541f08d2d9f2e8c3c79a1f12fc3/g
-:wq
+# 修改 chatId 为新的用户 ID 或群组 ID
+# 用户 ID: ou_xxxxxxxxxxxxxxxxxx
+# 群组 ID: oc_xxxxxxxxxxxxxxxxxx
 ```
 
-### 获取飞书群组 ID
+### 获取飞书 ID
 
 ```bash
 # 查看已配对设备信息
 openclaw device list
 
-# 从输出中找到飞书群组的 chatId
-# 格式通常为: oc_xxxxxxxxxxxxxxxxxx
+# 从输出中找到 chatId
+# 用户格式: ou_xxxxxxxxxxxxxxxxxx
+# 群组格式: oc_xxxxxxxxxxxxxxxxxx
 ```
 
 ## 🔗 相关文档
