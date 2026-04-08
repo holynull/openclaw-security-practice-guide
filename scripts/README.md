@@ -132,6 +132,49 @@ ssh user@server "chmod +x ~/openclaw-host.sh"
 
 ---
 
+### 4. Cron 任务消息模板
+
+#### cron-messages/nightly-security-audit.md
+
+**用途**: OpenClaw Cron 任务的消息模板（安全审计）
+
+**功能**:
+- 📋 定义审计任务的执行步骤
+- 🔧 配置飞书报告发送逻辑
+- 📊 规范报告格式和内容
+- 🎯 使用 feishu-messaging 插件发送报告
+
+**部署位置**:
+```bash
+~/.openclaw3/workspace/team/cron_messages/nightly-security-audit.md
+```
+
+**使用方式**:
+```bash
+# 1. 复制模板到服务器
+scp scripts/cron-messages/nightly-security-audit.md \
+    user@server:~/.openclaw3/workspace/team/cron_messages/
+
+# 2. 编辑文件，替换飞书群组 ID
+ssh user@server "vim ~/.openclaw3/workspace/team/cron_messages/nightly-security-audit.md"
+
+# 3. 注册 Cron 任务
+openclaw cron add "nightly-security-audit-host" \
+  --message "Read cron_messages/nightly-security-audit.md and execute all steps" \
+  --cron "0 3 * * *" \
+  ...
+```
+
+**优势**:
+- ✅ 任务逻辑与 Cron 配置分离
+- ✅ 易于维护和更新（无需重建 Cron 任务）
+- ✅ 支持复杂的多步骤任务
+- ✅ 可复用的模板结构
+
+**文档**: 参考 [宿主机部署指南 - 第四阶段](../docs/Host-Instance-Deployment-Guide-zh.md)
+
+---
+
 ## 🚀 快速开始
 
 ### 部署安全审计
@@ -198,7 +241,9 @@ scripts/
 ├── nightly-security-audit-v2.8.sh     # 安全审计脚本 v2.8
 ├── nightly-security-audit.sh          # 安全审计脚本（早期版本）
 ├── test-env-load.sh                   # 环境变量加载测试脚本
-└── openclaw-host.sh                   # 宿主机实例管理脚本
+├── openclaw-host.sh                   # 宿主机实例管理脚本
+└── cron-messages/                     # Cron 任务消息模板目录
+    └── nightly-security-audit.md      # 安全审计任务模板
 ```
 
 ## 🔐 安全注意事项
